@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ComicVerse - Web Comic Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+:root{--primary:#7c3aed;--primary-dark:#6d28d9;--accent:#ec4899;--bg:#f7f7fb;--surface:#fff;--surface-2:#f1f1f6;--text:#171717;--muted:#71717a;--border:rgba(0,0,0,.08);--shadow:0 15px 40px rgba(0,0,0,.08);--header-height:70px}
+body.dark{--bg:#0c0c12;--surface:#15151e;--surface-2:#20202b;--text:#f4f4f5;--muted:#a1a1aa;--border:rgba(255,255,255,.08)}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:"Be Vietnam Pro",sans-serif;background:var(--bg);color:var(--text);transition:.3s}
+button,input,select{font-family:inherit}button{cursor:pointer;border:none}a{text-decoration:none;color:inherit}img{display:block;max-width:100%}.hidden{display:none!important}
+.container{width:min(1400px,calc(100% - 40px));margin:auto}
+.header{position:fixed;top:0;left:0;right:0;height:var(--header-height);z-index:1000;background:color-mix(in srgb,var(--surface) 90%,transparent);backdrop-filter:blur(15px);border-bottom:1px solid var(--border)}
+.header-container{height:100%;display:flex;align-items:center;gap:20px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:21px;cursor:pointer}
+.logo-icon{width:40px;height:40px;display:grid;place-items:center;border-radius:12px;color:#fff;background:linear-gradient(135deg,var(--primary),var(--accent));transition:.3s}
+.logo:hover .logo-icon{transform:rotate(-8deg) scale(1.08)}
+.search-box{position:relative;flex:1;max-width:500px}
+.search-box input{width:100%;height:42px;padding:0 45px 0 15px;border-radius:10px;border:1px solid var(--border);background:var(--surface-2);color:var(--text);outline:none}
+.search-icon{position:absolute;right:15px;top:50%;transform:translateY(-50%);color:var(--muted)}
+.search-results{position:absolute;top:48px;left:0;right:0;max-height:350px;overflow:auto;border-radius:12px;background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow);z-index:1200}
+.search-result-item{display:flex;align-items:center;gap:10px;padding:10px;cursor:pointer}
+.search-result-item:hover{background:var(--surface-2)}
+.search-result-item img{width:42px;height:56px;object-fit:cover;border-radius:6px}
+.search-result-item small{display:block;color:var(--muted);margin-top:4px}
+.nav-menu{display:flex;gap:18px}.nav-menu a{font-size:13px;font-weight:600;color:var(--muted)}.nav-menu a:hover{color:var(--primary)}
+.header-actions{display:flex;gap:8px;align-items:center}.icon-btn{width:40px;height:40px;display:grid;place-items:center;border-radius:10px;background:var(--surface-2);color:var(--text)}.login-btn{padding:10px 16px;border-radius:9px;color:#fff;background:var(--primary)}.hamburger{display:none}
+.page{padding-top:var(--header-height);min-height:100vh}
+.hero{min-height:460px;display:flex;align-items:center;position:relative;overflow:hidden;color:#fff;background:linear-gradient(90deg,#09090b,#27272a)}
+.hero-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.35}
+.hero-content{position:relative;z-index:2;max-width:650px}.hero h1{font-size:clamp(40px,6vw,70px);line-height:1;margin-bottom:20px}.hero p{line-height:1.7;color:#d4d4d8;margin-bottom:25px}.btn{padding:11px 20px;border-radius:9px;font-weight:700}.btn-primary{color:#fff;background:var(--primary)}
+.home-section{padding:40px 0}.section-header{display:flex;justify-content:space-between;align-items:center;gap:20px;margin-bottom:20px}
+.filter-bar{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:25px}.filter-bar select{padding:10px 14px;border-radius:9px;background:var(--surface);color:var(--text);border:1px solid var(--border)}
+.comic-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}.comic-card{overflow:hidden;border-radius:14px;background:var(--surface);border:1px solid var(--border);transition:.25s;cursor:pointer}.comic-card:hover{transform:translateY(-5px);box-shadow:var(--shadow)}
+.comic-cover{position:relative;aspect-ratio:3/4;overflow:hidden}.comic-cover img{width:100%;height:100%;object-fit:cover;transition:.5s}.comic-card:hover .comic-cover img{transform:scale(1.07)}
+.comic-badge{position:absolute;top:10px;left:10px;padding:5px 8px;border-radius:6px;color:#fff;background:var(--accent);font-size:10px;font-weight:700}.comic-info{padding:14px}.comic-title{font-weight:700;margin-bottom:7px}.comic-meta{display:flex;justify-content:space-between;color:var(--muted);font-size:12px}
+.detail-page{padding:110px 0 60px}.detail-hero{padding:30px;border-radius:22px;background:var(--surface);border:1px solid var(--border);display:grid;grid-template-columns:260px 1fr;gap:35px}
+.detail-cover{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:14px;box-shadow:var(--shadow)}.detail-content{display:flex;flex-direction:column}.detail-title{font-size:clamp(30px,4vw,48px);margin-bottom:8px}.detail-original{color:var(--muted);margin-bottom:20px}
+.detail-tags{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:20px}.tag{padding:6px 11px;border-radius:20px;font-size:12px;color:var(--primary);background:rgba(124,58,237,.1)}
+.detail-info{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:20px}.info-item{font-size:14px}.info-item span{color:var(--muted)}
+.detail-stats{display:flex;flex-wrap:wrap;gap:20px;padding:15px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}.rating{color:#f59e0b}
+.detail-actions{display:flex;flex-wrap:wrap;gap:10px;margin:20px 0}.action-btn{display:flex;align-items:center;gap:8px;padding:11px 15px;border-radius:9px;background:var(--surface-2);color:var(--text)}.action-btn.active{color:#fff;background:var(--primary)}
+.synopsis{line-height:1.8;color:var(--muted);max-width:850px}.synopsis.collapsed{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}.synopsis-toggle{width:max-content;margin-top:8px;color:var(--primary);background:none;font-weight:700}
+.chapter-section{margin-top:30px;padding:25px;border-radius:18px;background:var(--surface);border:1px solid var(--border)}.chapter-toolbar{display:flex;flex-wrap:wrap;gap:10px;margin:20px 0}
+.chapter-search{flex:1;min-width:200px;padding:11px 14px;border-radius:9px;border:1px solid var(--border);background:var(--surface-2);color:var(--text)}.chapter-sort{padding:11px;border-radius:9px;background:var(--surface-2);color:var(--text)}
+.chapter-list{display:flex;flex-direction:column}.chapter-item{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:14px 8px;border-bottom:1px solid var(--border);transition:.2s;cursor:pointer}.chapter-item:hover{background:var(--surface-2)}.chapter-item.read{opacity:.5}.chapter-main{display:flex;align-items:center;gap:12px}.chapter-number{width:38px;height:38px;display:grid;place-items:center;border-radius:9px;color:#fff;background:var(--primary);font-size:12px}.chapter-name{font-weight:600}.chapter-time{color:var(--muted);font-size:12px}
+#readerPage{position:fixed;inset:0;z-index:5000;overflow:auto;background:#09090b;color:#fff}.reader-controls{position:fixed;top:0;left:0;right:0;height:62px;z-index:5100;display:flex;align-items:center;gap:8px;padding:0 12px;background:rgba(9,9,11,.95);backdrop-filter:blur(12px);transition:transform .3s}.reader-controls.hide{transform:translateY(-100%)}
+.reader-title{max-width:220px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-weight:700}.reader-select{max-width:180px;padding:9px;color:#fff;background:#18181b;border:1px solid #3f3f46;border-radius:7px}.reader-btn{width:38px;height:38px;display:grid;place-items:center;color:#fff;background:#27272a;border-radius:8px}.reader-spacer{flex:1}
+.reader-content{padding-top:62px;padding-bottom:100px}.webtoon-reader{width:100%;display:flex;flex-direction:column;align-items:center}.webtoon-reader img{width:var(--reader-width,80%);max-width:100%;margin-bottom:var(--reader-gap,0px)}
+.manga-reader{min-height:calc(100vh - 62px);display:flex;align-items:center;justify-content:center;position:relative}.manga-reader img{max-width:90vw;max-height:85vh;object-fit:contain}.manga-nav{position:absolute;top:50%;transform:translateY(-50%);width:55px;height:80px;color:#fff;background:rgba(0,0,0,.5);border-radius:10px}.manga-nav.left{left:20px}.manga-nav.right{right:20px}
+.reader-settings{position:fixed;top:72px;right:15px;width:300px;z-index:5200;padding:20px;border-radius:15px;background:#18181b;box-shadow:0 20px 60px rgba(0,0,0,.5)}.setting{margin-bottom:20px}.setting label{display:block;margin-bottom:8px;color:#a1a1aa;font-size:13px}.setting-buttons{display:flex;gap:5px}.setting-buttons button{flex:1;padding:8px;color:#fff;background:#27272a;border-radius:7px}.setting-buttons button.active{background:var(--primary)}.setting input{width:100%}
+.reader-end{text-align:center;padding:40px}.reader-end button{padding:13px 25px;border-radius:9px;color:#fff;background:var(--primary)}
+.mobile-menu{position:fixed;top:0;left:0;width:280px;height:100vh;z-index:6000;padding:80px 20px;background:var(--surface);transform:translateX(-100%);transition:.3s}.mobile-menu.open{transform:translateX(0)}.mobile-menu a{display:block;padding:15px 0;border-bottom:1px solid var(--border)}
+.bottom-nav{display:none}
+@media(max-width:1100px){.nav-menu{display:none}.hamburger{display:grid}.comic-grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:800px){.detail-hero{grid-template-columns:180px 1fr}.detail-info{grid-template-columns:1fr}}
+@media(max-width:600px){.container{width:calc(100% - 24px)}.logo span{display:none}.detail-page{padding-top:80px}.detail-hero{grid-template-columns:1fr;padding:15px}.detail-cover{width:180px;margin:auto}.detail-title{margin-top:20px}.comic-grid{grid-template-columns:repeat(2,1fr);gap:12px}.reader-title{max-width:100px}.reader-select{max-width:110px}.reader-settings{left:10px;right:10px;width:auto}.bottom-nav{position:fixed;display:flex;bottom:0;left:0;right:0;height:60px;z-index:7000;background:var(--surface);border-top:1px solid var(--border)}.bottom-nav a{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--muted);font-size:10px}.bottom-nav a.active{color:var(--primary)}}
+
+.muted{color:var(--muted)}.full-btn{width:100%;margin-top:10px}.modal-overlay{position:fixed;inset:0;z-index:9000;display:grid;place-items:center;padding:20px;background:rgba(0,0,0,.65);backdrop-filter:blur(8px)}.modal-card{position:relative;width:min(440px,100%);padding:28px;border-radius:20px;background:var(--surface);color:var(--text);box-shadow:0 30px 100px rgba(0,0,0,.35)}.modal-close{position:absolute;right:15px;top:15px;width:34px;height:34px;border-radius:50%;background:var(--surface-2);color:var(--text)}.auth-tabs{display:flex;gap:5px;margin-bottom:25px;padding:4px;border-radius:10px;background:var(--surface-2)}.auth-tab{flex:1;padding:10px;border-radius:7px;background:transparent;color:var(--muted)}.auth-tab.active{background:var(--surface);color:var(--primary);font-weight:700}.form-input{width:100%;padding:12px 14px;margin:7px 0;border:1px solid var(--border);border-radius:9px;background:var(--surface-2);color:var(--text);outline:none}.toast{position:fixed;left:50%;bottom:80px;transform:translateX(-50%);z-index:9999;padding:12px 18px;border-radius:10px;color:#fff;background:#18181b;box-shadow:var(--shadow);animation:toastIn .25s ease}.toast.hidden{display:none}@keyframes toastIn{from{opacity:0;transform:translate(-50%,15px)}to{opacity:1;transform:translate(-50%,0)}}.profile-avatar{width:80px;height:80px;display:grid;place-items:center;margin:0 auto 15px;border-radius:50%;font-size:30px;color:#fff;background:linear-gradient(135deg,var(--primary),var(--accent))}.profile-actions{display:grid;gap:10px;margin-top:20px}.genre-chip{padding:20px;border-radius:15px;background:var(--surface);border:1px solid var(--border);cursor:pointer;text-align:center;font-weight:700;transition:.2s}.genre-chip:hover{transform:translateY(-3px);border-color:var(--primary);color:var(--primary)}.ranking-row{display:flex;align-items:center;gap:15px;padding:14px;border-bottom:1px solid var(--border);cursor:pointer}.ranking-row:hover{background:var(--surface-2)}.rank-number{width:40px;font-size:22px;font-weight:800;color:var(--primary)}.rank-cover{width:50px;height:68px;object-fit:cover;border-radius:7px}.rank-info{flex:1}.rank-score{color:#f59e0b;font-weight:700}.user-avatar{width:36px;height:36px;display:grid;place-items:center;border-radius:50%;color:#fff;background:linear-gradient(135deg,var(--primary),var(--accent));font-size:13px;font-weight:800}.desktop-avatar{display:none}
+@media(max-width:600px){.notification-panel{right:10px!important;left:10px!important;width:auto!important}.header-actions .login-btn{display:none}.desktop-avatar{display:grid}.modal-card{padding:22px}.section-header{align-items:flex-start;flex-direction:column}}
+
+</style>
+</head>
+<body>
+
+<header class="header">
+<div class="container header-container">
+<button class="icon-btn hamburger" onclick="toggleMobileMenu()"><i class="fa-solid fa-bars"></i></button>
+<a class="logo" onclick="showHome()"><div class="logo-icon"><i class="fa-solid fa-book-open"></i></div><span>ComicVerse</span></a>
+<div class="search-box">
+<input id="searchInput" placeholder="Tìm kiếm truyện..." autocomplete="off">
+<i class="fa-solid fa-search search-icon"></i>
+<div id="searchResults" class="search-results hidden"></div>
+</div>
+<nav class="nav-menu">
+<a href="#" onclick="showHome();return false">Trang chủ</a><a href="#" onclick="showGenres();return false">Thể loại</a><a href="#" onclick="showRanking();return false">Xếp hạng</a><a href="#" onclick="showNew();return false">Truyện mới</a><a href="#" onclick="showLibrary('follow');return false">Theo dõi</a>
+</nav>
+<div class="header-actions">
+<button class="icon-btn" onclick="toggleTheme()" title="Đổi giao diện"><i class="fa-solid fa-moon"></i></button>
+<button id="notificationBtn" class="icon-btn" onclick="toggleNotifications(event)" title="Thông báo"><i class="fa-solid fa-bell"></i></button>
+<button id="authButton" class="login-btn" onclick="openAuth()">Đăng nhập</button>
+<button id="avatarButton" class="icon-btn desktop-avatar hidden" onclick="openProfile()" title="Tài khoản"><span id="avatarText" class="user-avatar">U</span></button>
+</div>
+</div>
+</header>
+
+<div id="mobileMenu" class="mobile-menu">
+<a href="#" onclick="showHome();toggleMobileMenu()"><i class="fa-solid fa-house"></i> Trang chủ</a>
+<a href="#" onclick="showGenres();toggleMobileMenu();return false"><i class="fa-solid fa-layer-group"></i> Thể loại</a>
+<a href="#" onclick="showRanking();toggleMobileMenu();return false"><i class="fa-solid fa-fire"></i> Xếp hạng</a>
+<a href="#" onclick="showLibrary('all');toggleMobileMenu();return false"><i class="fa-solid fa-bookmark"></i> Tủ sách</a>
+<a href="#" onclick="openProfile();toggleMobileMenu();return false"><i class="fa-solid fa-user"></i> Tài khoản</a>
+</div>
+
+<main id="homePage" class="page">
+<section class="hero">
+<img class="hero-bg" src="https://picsum.photos/seed/hero/1600/800">
+<div class="container"><div class="hero-content">
+<h1>The Last Guardian</h1>
+<p>Một chiến binh cuối cùng đứng giữa ranh giới của nhân loại và thế giới huyền bí.</p>
+<button class="btn btn-primary" onclick="openDetail(1)">Đọc ngay</button>
+</div></div>
+</section>
+<section class="container home-section">
+<div class="section-header"><h2>Truyện mới cập nhật</h2></div>
+<div class="filter-bar">
+<select id="genreFilter" onchange="applyFilters()"><option value="all">Tất cả thể loại</option><option value="Action">Action</option><option value="Fantasy">Fantasy</option><option value="Romance">Romance</option><option value="Comedy">Comedy</option><option value="Sci-Fi">Sci-Fi</option><option value="Adventure">Adventure</option></select>
+<select id="statusFilter" onchange="applyFilters()"><option value="all">Tất cả trạng thái</option><option value="Đang tiến hành">Đang tiến hành</option><option value="Hoàn thành">Hoàn thành</option></select>
+<select id="sortFilter" onchange="applyFilters()"><option value="new">Mới cập nhật</option><option value="views">Lượt xem</option><option value="rating">Đánh giá</option></select>
+</div>
+<div id="comicGrid" class="comic-grid"></div>
+</section>
+</main>
+
+<section id="detailPage" class="detail-page hidden">
+<div class="container">
+<div class="detail-hero">
+<img id="detailCover" class="detail-cover">
+<div class="detail-content">
+<h1 id="detailTitle" class="detail-title"></h1>
+<div id="detailOriginal" class="detail-original"></div>
+<div id="detailTags" class="detail-tags"></div>
+<div id="detailInfo" class="detail-info"></div>
+<div id="detailStats" class="detail-stats"></div>
+<div class="detail-actions">
+<button class="action-btn" onclick="readFirstChapter()"><i class="fa-solid fa-play"></i> Đọc từ đầu</button>
+<button class="action-btn" onclick="readLatestChapter()"><i class="fa-solid fa-forward"></i> Đọc mới nhất</button>
+<button id="followBtn" class="action-btn" onclick="toggleFollow()"><i class="fa-regular fa-bookmark"></i> Theo dõi</button>
+<button id="favoriteBtn" class="action-btn" onclick="toggleFavorite()"><i class="fa-regular fa-heart"></i> Yêu thích</button>
+<button class="action-btn" onclick="shareComic()"><i class="fa-solid fa-share"></i> Chia sẻ</button>
+</div>
+<p id="synopsis" class="synopsis collapsed"></p>
+<button id="synopsisToggle" class="synopsis-toggle" onclick="toggleSynopsis()">Xem thêm</button>
+</div>
+</div>
+<div class="chapter-section">
+<h2>Danh sách chương</h2>
+<div class="chapter-toolbar">
+<input id="chapterSearch" class="chapter-search" placeholder="Tìm chương..." oninput="renderChapterList()">
+<select id="chapterSort" class="chapter-sort" onchange="renderChapterList()"><option value="desc">Mới nhất trước</option><option value="asc">Cũ nhất trước</option></select>
+</div>
+<div id="chapterList" class="chapter-list"></div>
+</div>
+</div>
+</section>
+
+<section id="readerPage" class="hidden">
+<div id="readerControls" class="reader-controls">
+<button class="reader-btn" onclick="closeReader()" title="Quay lại"><i class="fa-solid fa-house"></i></button>
+<button class="reader-btn" onclick="previousChapter()" title="Chương trước"><i class="fa-solid fa-chevron-left"></i></button>
+<strong id="readerTitle" class="reader-title"></strong>
+<select id="readerChapterSelect" class="reader-select" onchange="changeChapter(this.value)"></select>
+<button class="reader-btn" onclick="nextChapter()" title="Chương tiếp"><i class="fa-solid fa-chevron-right"></i></button>
+<div class="reader-spacer"></div>
+<button class="reader-btn" onclick="toggleReaderMode()" title="Đổi chế độ đọc"><i class="fa-solid fa-book-open"></i></button>
+<button class="reader-btn" onclick="toggleReaderSettings()" title="Cài đặt"><i class="fa-solid fa-gear"></i></button>
+</div>
+
+<div id="readerSettings" class="reader-settings hidden">
+<div class="setting"><label>Chế độ đọc</label><div class="setting-buttons"><button id="modeWebtoon" onclick="setReaderMode('webtoon')">Cuộn dọc</button><button id="modeManga" onclick="setReaderMode('manga')">Lật trang</button></div></div>
+<div class="setting"><label>Chiều rộng ảnh</label><div class="setting-buttons"><button onclick="setReaderWidth('100%')">100%</button><button onclick="setReaderWidth('80%')">80%</button><button onclick="setReaderWidth('60%')">60%</button></div></div>
+<div class="setting"><label>Khoảng cách ảnh</label><input id="readerGap" type="range" min="0" max="40" value="0" oninput="setReaderGap(this.value)"></div>
+<div class="setting"><label>Tốc độ Auto Scroll</label><input id="autoScrollSpeed" type="range" min="1" max="10" value="3"><button style="width:100%;margin-top:10px;padding:10px;border-radius:8px" onclick="toggleAutoScroll()"><i class="fa-solid fa-play"></i> Auto Scroll</button></div>
+</div>
+
+<div class="reader-content">
+<div id="webtoonReader" class="webtoon-reader"></div>
+<div id="mangaReader" class="manga-reader hidden">
+<button class="manga-nav left" onclick="previousPage()"><i class="fa-solid fa-chevron-left"></i></button>
+<img id="mangaImage">
+<button class="manga-nav right" onclick="nextPage()"><i class="fa-solid fa-chevron-right"></i></button>
+</div>
+<div class="reader-end"><button onclick="nextChapter()">Chương tiếp theo <i class="fa-solid fa-arrow-right"></i></button></div>
+</div>
+</section>
+
+
+<!-- SPA auxiliary views -->
+<section id="libraryPage" class="detail-page hidden">
+  <div class="container">
+    <div class="section-header"><h1>Tủ sách của tôi</h1><button class="action-btn" onclick="showHome()"><i class="fa-solid fa-arrow-left"></i> Trang chủ</button></div>
+    <div class="filter-bar">
+      <button class="action-btn active" onclick="renderLibrary('all',this)">Tất cả</button>
+      <button class="action-btn" onclick="renderLibrary('follow',this)">Đang theo dõi</button>
+      <button class="action-btn" onclick="renderLibrary('favorite',this)">Yêu thích</button>
+      <button class="action-btn" onclick="renderHistory(this)">Lịch sử đọc</button>
+    </div>
+    <div id="libraryGrid" class="comic-grid"></div>
+  </div>
+</section>
+
+<section id="rankingPage" class="detail-page hidden">
+  <div class="container">
+    <div class="section-header"><h1>Bảng xếp hạng</h1><button class="action-btn" onclick="showHome()"><i class="fa-solid fa-arrow-left"></i> Trang chủ</button></div>
+    <div class="filter-bar">
+      <button class="action-btn active" onclick="renderRanking('day',this)">Top ngày</button>
+      <button class="action-btn" onclick="renderRanking('week',this)">Top tuần</button>
+      <button class="action-btn" onclick="renderRanking('month',this)">Top tháng</button>
+      <button class="action-btn" onclick="renderRanking('all',this)">All-time</button>
+    </div>
+    <div id="rankingList" class="chapter-section"></div>
+  </div>
+</section>
+
+<section id="newPage" class="detail-page hidden">
+  <div class="container">
+    <div class="section-header"><h1>Truyện mới cập nhật</h1><button class="action-btn" onclick="showHome()"><i class="fa-solid fa-arrow-left"></i> Trang chủ</button></div>
+    <div id="newGrid" class="comic-grid"></div>
+  </div>
+</section>
+
+<section id="genrePage" class="detail-page hidden">
+  <div class="container">
+    <div class="section-header"><h1>Thể loại</h1><button class="action-btn" onclick="showHome()"><i class="fa-solid fa-arrow-left"></i> Trang chủ</button></div>
+    <div id="genreGrid" class="comic-grid"></div>
+  </div>
+</section>
+
+<div id="notificationPanel" class="search-results hidden" style="position:fixed;top:60px;right:20px;width:340px;z-index:4000;padding:10px">
+  <div style="padding:10px;font-weight:800">Thông báo</div>
+  <div class="search-result-item" onclick="openDetail(1)"><i class="fa-solid fa-bell"></i><div><strong>The Last Guardian</strong><small>Chapter 30 vừa cập nhật.</small></div></div>
+  <div class="search-result-item" onclick="openDetail(5)"><i class="fa-solid fa-bell"></i><div><strong>Dragon Legacy</strong><small>Chapter mới đã phát hành.</small></div></div>
+</div>
+
+<div id="authModal" class="modal-overlay hidden">
+  <div class="modal-card">
+    <button class="modal-close" onclick="closeModal('authModal')"><i class="fa-solid fa-xmark"></i></button>
+    <div class="auth-tabs"><button class="auth-tab active" onclick="switchAuth('login',this)">Đăng nhập</button><button class="auth-tab" onclick="switchAuth('register',this)">Đăng ký</button></div>
+    <div id="loginForm">
+      <h2>Chào mừng trở lại</h2><p class="muted">Đăng nhập để đồng bộ tủ sách và lịch sử đọc.</p>
+      <input class="form-input" id="loginEmail" type="email" placeholder="Email">
+      <input class="form-input" id="loginPassword" type="password" placeholder="Mật khẩu">
+      <button class="btn btn-primary full-btn" onclick="loginDemo()">Đăng nhập</button>
+    </div>
+    <div id="registerForm" class="hidden">
+      <h2>Tạo tài khoản</h2><p class="muted">Tài khoản demo được lưu cục bộ trên trình duyệt.</p>
+      <input class="form-input" id="registerName" placeholder="Tên hiển thị">
+      <input class="form-input" id="registerEmail" type="email" placeholder="Email">
+      <input class="form-input" id="registerPassword" type="password" placeholder="Mật khẩu">
+      <button class="btn btn-primary full-btn" onclick="registerDemo()">Tạo tài khoản</button>
+    </div>
+  </div>
+</div>
+
+<div id="profileModal" class="modal-overlay hidden">
+  <div class="modal-card">
+    <button class="modal-close" onclick="closeModal('profileModal')"><i class="fa-solid fa-xmark"></i></button>
+    <div id="profileContent"></div>
+  </div>
+</div>
+
+<div id="toast" class="toast hidden"></div>
+
+<nav class="bottom-nav">
+<a href="#" class="active" onclick="showHome();return false"><i class="fa-solid fa-house"></i>Trang chủ</a>
+<a href="#" onclick="focusSearch();return false"><i class="fa-solid fa-search"></i>Tìm kiếm</a>
+<a href="#" onclick="showLibrary('all');return false"><i class="fa-solid fa-bookmark"></i>Tủ sách</a>
+<a href="#" onclick="openProfile();return false"><i class="fa-solid fa-user"></i>Tài khoản</a>
+</nav>
+
+<script>
+const comics=[
+{id:1,title:"The Last Guardian",original:"守护者的最后使命",author:"Akiro Tanaka",artist:"Kaito Studio",genres:["Action","Fantasy","Adventure"],status:"Đang tiến hành",views:1250000,followers:98500,rating:4.9,cover:"https://picsum.photos/seed/guardian/600/850",synopsis:"Trong một thế giới nơi những cánh cổng không gian liên tục mở ra, những con quái vật xuất hiện và đe dọa nền văn minh nhân loại. Một chiến binh trẻ mang trong mình sức mạnh bí ẩn phải tìm ra nguồn gốc của những cánh cổng trước khi thế giới sụp đổ.",chapters:30},
+{id:2,title:"Crimson Moon",original:"紅月",author:"Mika Sato",artist:"Moon Studio",genres:["Fantasy","Romance"],status:"Đang tiến hành",views:980000,followers:70000,rating:4.8,cover:"https://picsum.photos/seed/crimson/600/850",synopsis:"Khi mặt trăng đỏ xuất hiện trên bầu trời, một lời nguyền cổ đại thức tỉnh.",chapters:20},
+{id:3,title:"Cyber Samurai",original:"サイバー侍",author:"Kenji",artist:"Neo Art",genres:["Action","Sci-Fi"],status:"Hoàn thành",views:700000,followers:50000,rating:4.7,cover:"https://picsum.photos/seed/cyber/600/850",synopsis:"Một samurai sống trong thành phố tương lai phải đối mặt với tập đoàn quyền lực nhất thế giới.",chapters:25},
+{id:4,title:"Love Algorithm",original:"Love Algorithm",author:"Yuki",artist:"Heart Studio",genres:["Romance","Comedy"],status:"Đang tiến hành",views:600000,followers:42000,rating:4.6,cover:"https://picsum.photos/seed/love/600/850",synopsis:"Một cô gái phát hiện ra rằng người bạn cùng lớp của mình có thể dự đoán chính xác tương lai của tình yêu.",chapters:18},
+{id:5,title:"Dragon Legacy",original:"龍の遺産",author:"Hiro",artist:"Dragon Studio",genres:["Fantasy","Action"],status:"Đang tiến hành",views:800000,followers:60000,rating:4.8,cover:"https://picsum.photos/seed/dragon/600/850",synopsis:"Một thiếu niên kế thừa sức mạnh của con rồng cuối cùng.",chapters:22},
+{id:6,title:"School Hunter",original:"School Hunter",author:"Rin",artist:"Hunter Studio",genres:["Action","Comedy"],status:"Đang tiến hành",views:400000,followers:30000,rating:4.4,cover:"https://picsum.photos/seed/hunter/600/850",synopsis:"Một học sinh bình thường bất ngờ trở thành thợ săn quái vật.",chapters:15},
+{id:7,title:"Parallel World",original:"Parallel World",author:"Zero",artist:"Dimension Studio",genres:["Fantasy","Adventure"],status:"Hoàn thành",views:1100000,followers:80000,rating:4.9,cover:"https://picsum.photos/seed/world/600/850",synopsis:"Một cánh cửa bí ẩn đưa một chàng trai đến một thế giới song song.",chapters:40},
+{id:8,title:"Midnight Café",original:"Midnight Café",author:"Aya",artist:"Coffee Studio",genres:["Romance","Comedy"],status:"Đang tiến hành",views:300000,followers:20000,rating:4.3,cover:"https://picsum.photos/seed/cafe/600/850",synopsis:"Một quán cà phê chỉ mở cửa vào lúc nửa đêm.",chapters:12}
+];
+
+let currentComicId=1,currentChapter=1,currentPage=0,mangaPages=[],autoScrollTimer=null,lastScrollTop=0,synopsisExpanded=false;
+
+const Storage={
+get(key,fallback){try{const v=localStorage.getItem(key);return v?JSON.parse(v):fallback}catch{return fallback}},
+set(key,value){localStorage.setItem(key,JSON.stringify(value))},
+remove(key){localStorage.removeItem(key)}
+};
+
+function getHistory(){return Storage.get("comicverse_history",[])}
+function saveReadingProgress(){
+ const page=document.getElementById("readerPage");
+ if(page.classList.contains("hidden"))return;
+ let history=getHistory();
+ const item={comicId:currentComicId,chapter:currentChapter,progress:page.scrollTop,timestamp:Date.now()};
+ history=history.filter(x=>!(x.comicId===currentComicId&&x.chapter===currentChapter));
+ history.unshift(item);Storage.set("comicverse_history",history.slice(0,30));
+}
+function getReadChapters(){return Storage.get("comicverse_read_chapters",{})}
+function markChapterRead(comicId,chapter){
+ const read=getReadChapters();if(!read[comicId])read[comicId]=[];
+ if(!read[comicId].includes(chapter))read[comicId].push(chapter);
+ Storage.set("comicverse_read_chapters",read);
+}
+function isChapterRead(comicId,chapter){const read=getReadChapters();return Boolean(read[comicId]&&read[comicId].includes(chapter))}
+function getBookmarks(){return Storage.get("comicverse_bookmarks",[])}
+function toggleFollow(){const b=getBookmarks(),i=b.indexOf(currentComicId);i===-1?b.push(currentComicId):b.splice(i,1);Storage.set("comicverse_bookmarks",b);updateDetailActions()}
+function getFavorites(){return Storage.get("comicverse_favorites",[])}
+function toggleFavorite(){const f=getFavorites(),i=f.indexOf(currentComicId);i===-1?f.push(currentComicId):f.splice(i,1);Storage.set("comicverse_favorites",f);updateDetailActions()}
+function getComic(id){return comics.find(c=>c.id===Number(id))}
+
+function renderHome(list=comics){
+ const grid=document.getElementById("comicGrid");
+ if(!list.length){grid.innerHTML="<p>Không tìm thấy truyện phù hợp.</p>";return}
+ grid.innerHTML=list.map(c=>`<article class="comic-card" onclick="openDetail(${c.id})"><div class="comic-cover"><img src="${c.cover}" loading="lazy" alt="${c.title}"><span class="comic-badge">${c.id===1?"HOT":"NEW"}</span></div><div class="comic-info"><div class="comic-title">${c.title}</div><div class="comic-meta"><span>⭐ ${c.rating}</span><span>${c.chapters} chương</span></div></div></article>`).join("");
+}
+
+function applyFilters(){
+ const genre=document.getElementById("genreFilter").value,status=document.getElementById("statusFilter").value,sort=document.getElementById("sortFilter").value;
+ let result=[...comics];
+ if(genre!=="all")result=result.filter(c=>c.genres.includes(genre));
+ if(status!=="all")result=result.filter(c=>c.status===status);
+ if(sort==="views")result.sort((a,b)=>b.views-a.views);
+ if(sort==="rating")result.sort((a,b)=>b.rating-a.rating);
+ renderHome(result);
+}
+
+function openDetail(id){
+ currentComicId=Number(id);
+ if(!getComic(currentComicId))return;
+ document.getElementById("homePage").classList.add("hidden");
+ document.getElementById("readerPage").classList.add("hidden");
+ document.getElementById("detailPage").classList.remove("hidden");
+ renderDetail();window.scrollTo(0,0);
+}
+
+function renderDetail(){
+ const c=getComic(currentComicId);
+ document.getElementById("detailCover").src=c.cover;
+ document.getElementById("detailTitle").textContent=c.title;
+ document.getElementById("detailOriginal").textContent=c.original;
+ document.getElementById("detailTags").innerHTML=c.genres.map(g=>`<span class="tag">${g}</span>`).join("");
+ document.getElementById("detailInfo").innerHTML=`<div class="info-item"><span>Tác giả:</span> ${c.author}</div><div class="info-item"><span>Họa sĩ:</span> ${c.artist}</div><div class="info-item"><span>Trạng thái:</span> ${c.status}</div><div class="info-item"><span>Số chương:</span> ${c.chapters}</div>`;
+ document.getElementById("detailStats").innerHTML=`<span><i class="fa-solid fa-eye"></i> ${formatNumber(c.views)}</span><span><i class="fa-solid fa-users"></i> ${formatNumber(c.followers)}</span><span class="rating">⭐ ${c.rating}/5</span>`;
+ document.getElementById("synopsis").textContent=c.synopsis;synopsisExpanded=false;document.getElementById("synopsis").classList.add("collapsed");document.getElementById("synopsisToggle").textContent="Xem thêm";document.getElementById("chapterSearch").value="";renderChapterList();updateDetailActions();
+}
+
+function renderChapterList(){
+ const c=getComic(currentComicId),keyword=document.getElementById("chapterSearch").value.toLowerCase(),sort=document.getElementById("chapterSort").value;
+ let chapters=Array.from({length:c.chapters},(_,i)=>i+1);if(sort==="desc")chapters.reverse();
+ chapters=chapters.filter(ch=>String(ch).includes(keyword));
+ document.getElementById("chapterList").innerHTML=chapters.map(ch=>`<div class="chapter-item ${isChapterRead(c.id,ch)?"read":""}" onclick="openReader(${c.id},${ch})"><div class="chapter-main"><div class="chapter-number">${ch}</div><div><div class="chapter-name">Chapter ${ch}</div><div class="chapter-time">${ch%3===0?"Hôm qua":"2 ngày trước"}</div></div></div>${isChapterRead(c.id,ch)?'<i class="fa-solid fa-check"></i>':'<i class="fa-solid fa-book-open"></i>'}</div>`).join("");
+}
+
+function updateDetailActions(){
+ const follow=getBookmarks().includes(currentComicId),favorite=getFavorites().includes(currentComicId);
+ const fb=document.getElementById("followBtn"),fav=document.getElementById("favoriteBtn");
+ fb.classList.toggle("active",follow);fav.classList.toggle("active",favorite);
+ fb.innerHTML=follow?'<i class="fa-solid fa-bookmark"></i> Đang theo dõi':'<i class="fa-regular fa-bookmark"></i> Theo dõi';
+ fav.innerHTML=favorite?'<i class="fa-solid fa-heart"></i> Đã yêu thích':'<i class="fa-regular fa-heart"></i> Yêu thích';
+}
+function toggleSynopsis(){synopsisExpanded=!synopsisExpanded;const s=document.getElementById("synopsis"),b=document.getElementById("synopsisToggle");s.classList.toggle("collapsed",!synopsisExpanded);b.textContent=synopsisExpanded?"Thu gọn":"Xem thêm"}
+function readFirstChapter(){openReader(currentComicId,1)}
+function readLatestChapter(){openReader(currentComicId,getComic(currentComicId).chapters)}
+async function shareComic(){
+ const c=getComic(currentComicId),data={title:c.title,text:`Đọc ${c.title} trên ComicVerse`,url:location.href};
+ if(navigator.share)await navigator.share(data);else{await navigator.clipboard.writeText(location.href);alert("Đã sao chép liên kết!")}
+}
+
+function openReader(comicId,chapter){
+ currentComicId=Number(comicId);currentChapter=Number(chapter);currentPage=0;
+ document.getElementById("homePage").classList.add("hidden");document.getElementById("detailPage").classList.add("hidden");document.getElementById("readerPage").classList.remove("hidden");
+ renderReader();
+ const h=getHistory().find(x=>x.comicId===currentComicId&&x.chapter===currentChapter);
+ if(h)setTimeout(()=>document.getElementById("readerPage").scrollTop=h.progress||0,100);
+}
+function closeReader(){saveReadingProgress();stopAutoScroll();document.getElementById("readerPage").classList.add("hidden");openDetail(currentComicId)}
+function generatePages(){return Array.from({length:10},(_,i)=>`https://picsum.photos/seed/comic-${currentComicId}-${currentChapter}-${i+1}/900/1400`)}
+function renderReader(){
+ const c=getComic(currentComicId);document.getElementById("readerTitle").textContent=c.title;
+ document.getElementById("readerChapterSelect").innerHTML=Array.from({length:c.chapters},(_,i)=>`<option value="${i+1}" ${i+1===currentChapter?"selected":""}>Chapter ${i+1}</option>`).join("");
+ const pages=generatePages();getReaderMode()==="webtoon"?renderWebtoon(pages):renderManga(pages);markChapterRead(currentComicId,currentChapter);saveReadingProgress();updateReaderModeButtons();
+}
+function renderWebtoon(pages){document.getElementById("webtoonReader").classList.remove("hidden");document.getElementById("mangaReader").classList.add("hidden");document.getElementById("webtoonReader").innerHTML=pages.map(src=>`<img src="${src}" loading="lazy" alt="Comic page">`).join("");applyReaderSettings()}
+function renderManga(pages){mangaPages=pages;currentPage=0;document.getElementById("webtoonReader").classList.add("hidden");document.getElementById("mangaReader").classList.remove("hidden");updateMangaPage()}
+function updateMangaPage(){document.getElementById("mangaImage").src=mangaPages[currentPage]}
+function nextPage(){if(currentPage<mangaPages.length-1){currentPage++;updateMangaPage()}}
+function previousPage(){if(currentPage>0){currentPage--;updateMangaPage()}}
+function changeChapter(ch){saveReadingProgress();currentChapter=Number(ch);currentPage=0;renderReader();document.getElementById("readerPage").scrollTop=0}
+function nextChapter(){const c=getComic(currentComicId);if(currentChapter<c.chapters)changeChapter(currentChapter+1);else alert("Đây là chương mới nhất.")}
+function previousChapter(){if(currentChapter>1)changeChapter(currentChapter-1)}
+function getReaderMode(){return localStorage.getItem("comicverse_reader_mode")||"webtoon"}
+function setReaderMode(mode){localStorage.setItem("comicverse_reader_mode",mode);renderReader()}
+function toggleReaderMode(){setReaderMode(getReaderMode()==="webtoon"?"manga":"webtoon")}
+function updateReaderModeButtons(){document.getElementById("modeWebtoon").classList.toggle("active",getReaderMode()==="webtoon");document.getElementById("modeManga").classList.toggle("active",getReaderMode()==="manga")}
+function toggleReaderSettings(){document.getElementById("readerSettings").classList.toggle("hidden")}
+function setReaderWidth(width){localStorage.setItem("comicverse_reader_width",width);applyReaderSettings()}
+function setReaderGap(gap){localStorage.setItem("comicverse_reader_gap",gap);applyReaderSettings()}
+function applyReaderSettings(){
+ const width=localStorage.getItem("comicverse_reader_width")||"80%",gap=localStorage.getItem("comicverse_reader_gap")||"0";
+ document.getElementById("webtoonReader").style.setProperty("--reader-width",width);document.getElementById("webtoonReader").style.setProperty("--reader-gap",gap+"px");document.getElementById("readerGap").value=gap;
+}
+function toggleAutoScroll(){
+ if(autoScrollTimer){stopAutoScroll();return}
+ const speed=Number(document.getElementById("autoScrollSpeed").value);
+ autoScrollTimer=setInterval(()=>document.getElementById("readerPage").scrollTop+=speed,50);
+}
+function stopAutoScroll(){if(autoScrollTimer){clearInterval(autoScrollTimer);autoScrollTimer=null}}
+
+document.getElementById("readerPage").addEventListener("scroll",function(){
+ const current=this.scrollTop,controls=document.getElementById("readerControls");
+ if(current>lastScrollTop&&current>100)controls.classList.add("hide");else controls.classList.remove("hide");
+ lastScrollTop=current;saveReadingProgress();
+});
+
+document.addEventListener("keydown",event=>{
+ if(document.getElementById("readerPage").classList.contains("hidden"))return;
+ if(event.key==="ArrowRight"){getReaderMode()==="manga"?nextPage():nextChapter()}
+ if(event.key==="ArrowLeft"){getReaderMode()==="manga"?previousPage():previousChapter()}
+ if(event.code==="Space"){event.preventDefault();document.getElementById("readerPage").scrollBy({top:window.innerHeight*.8,behavior:"smooth"})}
+});
+
+function toggleTheme(){document.body.classList.toggle("dark");localStorage.setItem("comicverse_theme",document.body.classList.contains("dark")?"dark":"light")}
+function loadTheme(){if(localStorage.getItem("comicverse_theme")==="dark")document.body.classList.add("dark")}
+function showHome(){document.getElementById("detailPage").classList.add("hidden");document.getElementById("readerPage").classList.add("hidden");document.getElementById("homePage").classList.remove("hidden");window.scrollTo(0,0)}
+function formatNumber(n){if(n>=1000000)return(n/1000000).toFixed(1)+"M";if(n>=1000)return(n/1000).toFixed(1)+"K";return n}
+function toggleMobileMenu(){document.getElementById("mobileMenu").classList.toggle("open")}
+
+const searchInput=document.getElementById("searchInput"),searchResults=document.getElementById("searchResults");
+searchInput.addEventListener("input",function(){
+ const keyword=this.value.toLowerCase().trim();
+ if(!keyword){searchResults.classList.add("hidden");renderHome();return}
+ const results=comics.filter(c=>c.title.toLowerCase().includes(keyword)||c.original.toLowerCase().includes(keyword)||c.genres.some(g=>g.toLowerCase().includes(keyword)));
+ searchResults.classList.remove("hidden");
+ searchResults.innerHTML=results.length?results.map(c=>`<div class="search-result-item" onclick="openDetail(${c.id});closeSearch()"><img src="${c.cover}"><div><strong>${c.title}</strong><small>${c.genres.join(" • ")}</small></div></div>`).join(""):'<div style="padding:15px;color:var(--muted)">Không tìm thấy truyện.</div>';
+ renderHome(results);
+});
+function closeSearch(){searchResults.classList.add("hidden")}
+document.addEventListener("click",e=>{if(!e.target.closest(".search-box"))closeSearch()});
+loadTheme();renderHome();applyReaderSettings();updateAuthUI();
+
+/* ===================== COMICVERSE COMPLETE SPA PATCH ===================== */
+const viewIds=["homePage","detailPage","readerPage","libraryPage","rankingPage","newPage","genrePage"];
+function hideAllViews(){viewIds.forEach(id=>{const el=document.getElementById(id);if(el)el.classList.add("hidden")});}
+function activateBottom(index){document.querySelectorAll(".bottom-nav a").forEach((a,i)=>a.classList.toggle("active",i===index))}
+function showHome(){hideAllViews();document.getElementById("homePage").classList.remove("hidden");activateBottom(0);window.scrollTo({top:0,behavior:"smooth"});closeSearch();closeNotifications()}
+function showLibrary(type="all"){hideAllViews();document.getElementById("libraryPage").classList.remove("hidden");activateBottom(2);renderLibrary(type);window.scrollTo(0,0)}
+function showRanking(){hideAllViews();document.getElementById("rankingPage").classList.remove("hidden");renderRanking("day");window.scrollTo(0,0)}
+function showNew(){hideAllViews();document.getElementById("newPage").classList.remove("hidden");document.getElementById("newGrid").innerHTML="";renderNew();window.scrollTo(0,0)}
+function showGenres(){hideAllViews();document.getElementById("genrePage").classList.remove("hidden");renderGenres();window.scrollTo(0,0)}
+function focusSearch(){showHome();setTimeout(()=>{searchInput.focus();searchInput.scrollIntoView({behavior:"smooth",block:"center"})},50)}
+function closeNotifications(){document.getElementById("notificationPanel").classList.add("hidden")}
+function toggleNotifications(e){e.stopPropagation();document.getElementById("notificationPanel").classList.toggle("hidden")}
+document.addEventListener("click",e=>{if(!e.target.closest("#notificationPanel")&&!e.target.closest("#notificationBtn"))closeNotifications()});
+
+function openAuth(){document.getElementById("authModal").classList.remove("hidden");switchAuth("login")}
+function closeModal(id){document.getElementById(id).classList.add("hidden")}
+function switchAuth(type,btn){
+ document.getElementById("loginForm").classList.toggle("hidden",type!=="login");
+ document.getElementById("registerForm").classList.toggle("hidden",type!=="register");
+ document.querySelectorAll(".auth-tab").forEach(x=>x.classList.remove("active"));
+ const target=btn||document.querySelector(`.auth-tab:nth-child(${type==="login"?1:2})`);if(target)target.classList.add("active");
+}
+function currentUser(){return Storage.get("comicverse_user",null)}
+function loginDemo(){
+ const email=document.getElementById("loginEmail").value.trim(),password=document.getElementById("loginPassword").value;
+ if(!email||!password)return toast("Vui lòng nhập email và mật khẩu.");
+ const user=Storage.get("comicverse_account_"+email,null);
+ if(!user)return toast("Chưa có tài khoản demo này. Hãy đăng ký trước.");
+ Storage.set("comicverse_user",user);closeModal("authModal");updateAuthUI();toast("Đăng nhập thành công!");
+}
+function registerDemo(){
+ const name=document.getElementById("registerName").value.trim(),email=document.getElementById("registerEmail").value.trim(),password=document.getElementById("registerPassword").value;
+ if(!name||!email||!password)return toast("Vui lòng điền đầy đủ thông tin.");
+ const user={name,email,password,createdAt:Date.now()};
+ Storage.set("comicverse_account_"+email,user);Storage.set("comicverse_user",{name,email});closeModal("authModal");updateAuthUI();toast("Tạo tài khoản thành công!");
+}
+function logoutDemo(){Storage.remove("comicverse_user");closeModal("profileModal");updateAuthUI();toast("Đã đăng xuất.")}
+function updateAuthUI(){
+ const user=currentUser(),btn=document.getElementById("authButton"),avatar=document.getElementById("avatarButton"),text=document.getElementById("avatarText");
+ if(user){btn.classList.add("hidden");avatar.classList.remove("hidden");text.textContent=(user.name||"U").charAt(0).toUpperCase()}
+ else{btn.classList.remove("hidden");avatar.classList.add("hidden")}
+}
+function openProfile(){
+ const user=currentUser(),history=getHistory(),bookmarks=getBookmarks(),favorites=getFavorites();
+ document.getElementById("profileContent").innerHTML=user?`
+ <div class="profile-avatar">${(user.name||"U").charAt(0).toUpperCase()}</div>
+ <h2 style="text-align:center">${escapeHTML(user.name||"Người dùng")}</h2>
+ <p class="muted" style="text-align:center">${escapeHTML(user.email||"")}</p>
+ <div class="profile-actions">
+ <button class="action-btn" onclick="showLibrary('all');closeModal('profileModal')"><i class="fa-solid fa-bookmark"></i> Tủ sách (${bookmarks.length})</button>
+ <button class="action-btn" onclick="renderHistory();closeModal('profileModal')"><i class="fa-solid fa-clock-rotate-left"></i> Lịch sử (${history.length})</button>
+ <button class="action-btn" onclick="logoutDemo()"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</button>
+ </div>`:
+ `<div class="profile-avatar"><i class="fa-solid fa-user"></i></div><h2 style="text-align:center">Bạn chưa đăng nhập</h2><p class="muted" style="text-align:center">Đăng nhập để sử dụng tủ sách và đồng bộ dữ liệu.</p><div class="profile-actions"><button class="btn btn-primary" onclick="closeModal('profileModal');openAuth()">Đăng nhập / Đăng ký</button></div>`;
+ document.getElementById("profileModal").classList.remove("hidden");
+}
+function toast(message){const el=document.getElementById("toast");el.textContent=message;el.classList.remove("hidden");clearTimeout(window.toastTimer);window.toastTimer=setTimeout(()=>el.classList.add("hidden"),2600)}
+function escapeHTML(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
+
+function comicCard(c){return `<article class="comic-card" onclick="openDetail(${c.id})"><div class="comic-cover"><img src="${c.cover}" loading="lazy" alt="${escapeHTML(c.title)}"><span class="comic-badge">${c.id===1?"HOT":"NEW"}</span></div><div class="comic-info"><div class="comic-title">${escapeHTML(c.title)}</div><div class="comic-meta"><span>⭐ ${c.rating}</span><span>${c.chapters} chương</span></div></div></article>`}
+function renderLibrary(type="all",clicked){
+ if(clicked){document.querySelectorAll("#libraryPage .filter-bar .action-btn").forEach(b=>b.classList.remove("active"));clicked.classList.add("active")}
+ let list;
+ if(type==="follow")list=comics.filter(c=>getBookmarks().includes(c.id));
+ else if(type==="favorite")list=comics.filter(c=>getFavorites().includes(c.id));
+ else list=comics;
+ document.getElementById("libraryGrid").innerHTML=list.length?list.map(comicCard).join(""):`<div style="grid-column:1/-1;padding:40px;text-align:center;color:var(--muted)">Chưa có truyện trong mục này.</div>`;
+}
+function renderHistory(){
+ hideAllViews();document.getElementById("libraryPage").classList.remove("hidden");activateBottom(2);
+ const history=getHistory(),grid=document.getElementById("libraryGrid");
+ grid.innerHTML=history.length?history.map(h=>{const c=getComic(h.comicId);return c?`<article class="comic-card" onclick="openReader(${c.id},${h.chapter})"><div class="comic-cover"><img src="${c.cover}" loading="lazy"><span class="comic-badge">ĐANG ĐỌC</span></div><div class="comic-info"><div class="comic-title">${escapeHTML(c.title)}</div><div class="comic-meta"><span>Chapter ${h.chapter}</span><span>${new Date(h.timestamp).toLocaleDateString("vi-VN")}</span></div></div></article>`:""}).join(""):`<div style="grid-column:1/-1;padding:40px;text-align:center;color:var(--muted)">Lịch sử đọc đang trống.</div>`;
+ window.scrollTo(0,0);
+}
+function renderRanking(period="day",clicked){
+ if(clicked){document.querySelectorAll("#rankingPage .filter-bar .action-btn").forEach(b=>b.classList.remove("active"));clicked.classList.add("active")}
+ let list=[...comics];
+ const factor={day:1,week:1.4,month:1.8,all:2.2}[period]||1;
+ list.sort((a,b)=>(b.views*factor+b.rating*10000)-(a.views*factor+a.rating*10000));
+ document.getElementById("rankingList").innerHTML=list.map((c,i)=>`<div class="ranking-row" onclick="openDetail(${c.id})"><div class="rank-number">#${i+1}</div><img class="rank-cover" src="${c.cover}" loading="lazy"><div class="rank-info"><strong>${escapeHTML(c.title)}</strong><div class="muted">${c.genres.join(" • ")} · ${formatNumber(c.views)} lượt xem</div></div><div class="rank-score">⭐ ${c.rating}</div></div>`).join("");
+}
+function renderNew(){document.getElementById("newGrid").innerHTML=[...comics].reverse().map(comicCard).join("")}
+function renderGenres(){
+ const genres=[...new Set(comics.flatMap(c=>c.genres))];
+ document.getElementById("genreGrid").innerHTML=genres.map(g=>`<div class="genre-chip" onclick="filterGenrePage('${g}')"><i class="fa-solid fa-layer-group"></i><br><br>${g}<div class="muted" style="margin-top:8px">${comics.filter(c=>c.genres.includes(g)).length} truyện</div></div>`).join("");
+}
+function filterGenrePage(genre){
+ const list=comics.filter(c=>c.genres.includes(genre));
+ document.getElementById("genreGrid").innerHTML=`<div style="grid-column:1/-1"><button class="action-btn" onclick="renderGenres()"><i class="fa-solid fa-arrow-left"></i> Tất cả thể loại</button></div>`+list.map(comicCard).join("");
+}
+function updateDetailActions(){
+ const follow=getBookmarks().includes(currentComicId),favorite=getFavorites().includes(currentComicId);
+ const fb=document.getElementById("followBtn"),fav=document.getElementById("favoriteBtn");
+ fb.classList.toggle("active",follow);fav.classList.toggle("active",favorite);
+ fb.innerHTML=follow?'<i class="fa-solid fa-bookmark"></i> Đang theo dõi':'<i class="fa-regular fa-bookmark"></i> Theo dõi';
+ fav.innerHTML=favorite?'<i class="fa-solid fa-heart"></i> Đã yêu thích':'<i class="fa-regular fa-heart"></i> Yêu thích';
+}
+function toggleFollow(){const b=getBookmarks(),i=b.indexOf(currentComicId);i===-1?b.push(currentComicId):b.splice(i,1);Storage.set("comicverse_bookmarks",b);updateDetailActions();toast(i===-1?"Đã thêm vào tủ sách":"Đã bỏ theo dõi")}
+function toggleFavorite(){const f=getFavorites(),i=f.indexOf(currentComicId);i===-1?f.push(currentComicId):f.splice(i,1);Storage.set("comicverse_favorites",f);updateDetailActions();toast(i===-1?"Đã thêm vào yêu thích":"Đã bỏ yêu thích")}
+
+/* Make detail navigation compatible with auxiliary SPA views */
+const originalOpenDetail=openDetail;
+openDetail=function(id){
+ hideAllViews();document.getElementById("detailPage").classList.remove("hidden");currentComicId=Number(id);renderDetail();window.scrollTo(0,0);
+};
+const originalCloseReader=closeReader;
+closeReader=function(){saveReadingProgress();stopAutoScroll();hideAllViews();document.getElementById("detailPage").classList.remove("hidden");renderDetail();window.scrollTo(0,0)};
+
+/* Reader progress is throttled to avoid excessive localStorage writes */
+let progressSaveTimer=null;
+const originalSaveReadingProgress=saveReadingProgress;
+saveReadingProgress=function(){
+ clearTimeout(progressSaveTimer);progressSaveTimer=setTimeout(()=>{
+   const page=document.getElementById("readerPage");if(!page||page.classList.contains("hidden"))return;
+   let history=getHistory();const item={comicId:currentComicId,chapter:currentChapter,progress:page.scrollTop,timestamp:Date.now()};
+   history=history.filter(x=>!(x.comicId===currentComicId&&x.chapter===currentChapter));history.unshift(item);Storage.set("comicverse_history",history.slice(0,30));
+ },250);
+};
+
+/* Theme persists and updates icon */
+function loadTheme(){if(localStorage.getItem("comicverse_theme")==="dark")document.body.classList.add("dark");updateThemeIcon()}
+function toggleTheme(){document.body.classList.toggle("dark");localStorage.setItem("comicverse_theme",document.body.classList.contains("dark")?"dark":"light");updateThemeIcon();toast(document.body.classList.contains("dark")?"Đã bật Dark Mode":"Đã bật Light Mode")}
+function updateThemeIcon(){const i=document.querySelector('.header-actions .icon-btn:first-child i');if(i)i.className=document.body.classList.contains("dark")?"fa-solid fa-sun":"fa-solid fa-moon"}
+
+updateAuthUI();loadTheme();
+
+</script>
+</body>
+</html>
